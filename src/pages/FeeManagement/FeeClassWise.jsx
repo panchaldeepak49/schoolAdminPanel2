@@ -6,6 +6,8 @@ import { message } from 'antd';
 import { BallTriangle, Bars, TailSpin, ThreeCircles } from 'react-loader-spinner';
 import debounce from 'lodash.debounce';
 import TakeFeeModal from '../../components/FeeModals/TakeFeeModal';
+import FeeDetailModal from '../../components/FeeModals/FeeDetailModal';
+import DeleteFeeModal from '../../components/FeeModals/DeleteFeeModal';
 
 
 const FeeClassWise = () => {
@@ -13,10 +15,14 @@ const FeeClassWise = () => {
       const[schId,setSchId] = useState('');
       const[studentFee,setStudentFee] = useState('');
       const[selectedStandard,setSelectedStandard] = useState('X');
+      const [apiClass,setApiClass] = useState('');
       const[loading,setLoading] = useState(false);
       //console.log(studentFee)
       const[takeFeeModal,setTakeFeeModal] = useState(false);
+      const[viewFeeModal,setViewFeeModal] = useState(false);
+      const[deleteFeeModal,setDeleteFeeModal] = useState(false);
       const[transmitData,setTransmitData] = useState('');
+
 
 
     useEffect(() => {
@@ -43,7 +49,7 @@ const FeeClassWise = () => {
            setStudentFee(result);
             // console.log(result)
            const apiMessage = res.data.message;
-           message.success(apiMessage);
+           //message.success(apiMessage);
            setLoading(false);
         })
         .catch((err)=>{
@@ -74,9 +80,49 @@ const FeeClassWise = () => {
     const debouncedFetchData = debounce(fetchStudentsFee, 2000);
     //////////////////////////////////////////////////////////////////////
     const takeFee =(userData)=>{
-        setTakeFeeModal(true);
+        setTakeFeeModal(!takeFeeModal);
         setTransmitData(userData);
     }
+
+    const viewFeeDetail =(userData)=>{
+      setViewFeeModal(!viewFeeModal);
+      setTransmitData(userData);
+    }
+
+  const viewDeleteFee =(userData)=>{
+    setDeleteFeeModal(!deleteFeeModal);
+    setTransmitData(userData);
+   }
+    ///////////////////////////////////////////////////////////////
+    const fetchAllClass = async(searchQuery) => {
+      if (!schId) {
+          // Prevent API call if schId is not set
+          return;
+        }
+         
+      await axios.get(`http://localhost:4000/schoolApi/getAllClasses?schoolId=${schId}&&search=${searchQuery ?? " "}`,{
+          headers : {
+              "Content-Type" : "application/json"
+          }
+      })
+      .then((res)=>{
+         const result = res.data?.allClasses;
+         setApiClass(result);
+         //  console.log(result)
+         const apiMessage = res.data.message;
+         //message.success(apiMessage);
+      })
+      .catch((err)=>{
+          const apiMessage = err.response?.data?.message || 'an error occurred';
+          message.error(apiMessage)
+      })
+    }
+    
+    useEffect(()=>{
+      if(schId){
+        fetchAllClass();
+      }
+    },[schId])
 
   return (
     <>
@@ -89,7 +135,7 @@ const FeeClassWise = () => {
         <p className='flex items-center gap-2 text:sm md:text-xl font-Rubik text-white'>Class {selectedStandard} 
           <span className='hidden md:block'>Students </span>
           <span className='ml-1 md:ml-0'>Fee Info (2024-25)</span> </p>
-        <select className='outline-none rounded-xl px-1 bg-blue-200 w-12 sm:w-14' value={selectedStandard} onChange={(e)=>setSelectedStandard(e.target.value)}>
+        {/* <select className='outline-none rounded-xl px-1 bg-blue-200 w-12 sm:w-14' value={selectedStandard} onChange={(e)=>setSelectedStandard(e.target.value)}>
          <option value='VI-A'>VI-A</option>
          <option value='VI-B'>VI-B</option>
           <option value='VII'>VII</option>
@@ -97,7 +143,16 @@ const FeeClassWise = () => {
           <option value='VIII-B'>VIII-B</option>
           <option value='IX'>IX</option>
           <option value='X'>X</option>
-        </select>
+        </select> */}
+        { apiClass.length > 0 ?
+           <select className='w-10 sm:w-16 rounded-md bg-orange-300 outline-none text-xs sm:text-base cursor-pointer' value={selectedStandard} onChange={(e)=>setSelectedStandard(e.target.value)}>
+            <option value='' disabled>Choose Class</option>
+            {apiClass.map((data,index)=>(
+            <option key={index} value={data.class}>{data.class}</option>
+            ))}
+           </select> 
+            : " "
+          } 
          <div className='sm:mr-4 flex items-center sm:gap-4'>
         <p className='flex  text-xs sm:text-base font-Rubik text-gray-100'><span className='md:hidden'>T Stu : </span>
         <span className='hidden md:block'>Total Students :</span>
@@ -150,6 +205,8 @@ const FeeClassWise = () => {
      </div> 
 
      { takeFeeModal && <TakeFeeModal transmitData={transmitData} setTakeFeeModal={setTakeFeeModal} fetchStudentsFee={fetchStudentsFee} /> }
+     { viewFeeModal && <FeeDetailModal transmitData={transmitData} setViewFeeModal={setViewFeeModal} fetchStudentsFee={fetchStudentsFee} /> }
+      { deleteFeeModal && <DeleteFeeModal transmitData={transmitData} setDeleteFeeModal={setDeleteFeeModal} fetchStudentsFee={fetchStudentsFee} /> }
     </>
   )
 }

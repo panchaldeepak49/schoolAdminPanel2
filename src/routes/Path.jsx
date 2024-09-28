@@ -9,6 +9,8 @@ import Admission from '../pages/Admission/Admission';
 import AllStandardStu from '../pages/Dashboard/AllStandardStu';
 import StudentClassWise from '../pages/Dashboard/StudentClassWise';
 import FeeClassWise from '../pages/FeeManagement/FeeClassWise';
+import ClassAndFee from '../pages/ClassManagement/ClassAndFee';
+import StaffManagement from '../pages/StaffManagement/StaffManagement';
 
 const Path = () => {
 
@@ -41,6 +43,8 @@ const Path = () => {
             <Route path= "/allStanStudents" element={<AllStandardStu />}></Route>
             <Route path= "/stuClassWise" element={<StudentClassWise />}></Route>
             <Route path= "/feeManagement" element={<FeeClassWise />}></Route>
+            <Route path= "/classManagement" element={<ClassAndFee />}></Route>
+            <Route path= "/staffManagement" element={<StaffManagement />}></Route>
         </Routes>
         </div>
     </Router>

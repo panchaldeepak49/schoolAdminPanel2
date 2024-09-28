@@ -11,13 +11,13 @@ const Admission = () => {
     const[name,setName] = useState('');
     const[fatherName,setFatherName] = useState('');
     const [selectClass, setSelectClass] = useState(null);
-    // const {apiClass,setApiClass} = useContext(MyContext);
+    const [apiClass,setApiClass] = useState('');
     const[rollNo,setRollNo] = useState('');
     const[address,setAddress] = useState('');
     const[admissionDate,setAdmissionDate] = useState('');
     const[gender,setGender] = useState('');
     const[contact,setContact] = useState('');
-    //console.log(schId);
+    console.log(selectClass);
     const[imgURL,setImgURL] = useState('');
 
     useEffect(() => {
@@ -57,6 +57,37 @@ const Admission = () => {
             message.error(apiMessage)
         })
       }
+      ///////////////////////////////////////////////////////////////////////
+      const fetchAllClass = async(searchQuery) => {
+        if (!schId) {
+            // Prevent API call if schId is not set
+            return;
+          }
+           
+        await axios.get(`http://localhost:4000/schoolApi/getAllClasses?schoolId=${schId}&&search=${searchQuery ?? " "}`,{
+            headers : {
+                "Content-Type" : "application/json"
+            }
+        })
+        .then((res)=>{
+           const result = res.data?.allClasses;
+           setApiClass(result);
+            console.log(result)
+           const apiMessage = res.data.message;
+           message.success(apiMessage);
+          
+        })
+        .catch((err)=>{
+            const apiMessage = err.response?.data?.message || 'an error occurred';
+            message.error(apiMessage)
+        })
+    }
+
+    useEffect(()=>{
+        if(schId){
+          fetchAllClass();
+        }
+    },[schId])
     
      
 
@@ -76,7 +107,7 @@ const Admission = () => {
         <input type='text' value={name} onChange={(e)=>setName(e.target.value)} className='w-[70%] py-1 pl-2  rounded-md  border-2' placeholder='Enter Name*'></input>
         <input type='text' value={fatherName} onChange={(e)=>setFatherName(e.target.value)} className='w-[70%] py-1 pl-2  rounded-md border-2' placeholder='Father Name*'></input>
        
-        <select
+        {/* <select
                 value={selectClass}
                 onChange={(e)=>setSelectClass(e.target.value)}
                 className='w-[70%] h-10 py-0 pl-0  rounded-md border-2 text-md'
@@ -89,17 +120,17 @@ const Admission = () => {
                  <option value={'VIII-B'}>VIII-B</option>
                  <option value={'IX'}>IX</option>
                  <option value={'X'}>X</option>
-            </select>
+            </select> */}
 
-          {/* { apiClass.length > 0 ?
-           <select className='w-[70%] h-10 outline-none pl-2 rounded-md' value={selectClass} onChange={(e)=>setSelectClass(e.target.value)}>
+          { apiClass.length > 0 ?
+           <select className='w-[70%] h-8 outline-none pl-2 rounded-md' value={selectClass} onChange={(e)=>setSelectClass(e.target.value)}>
             <option value='' disabled>Choose Class</option>
             {apiClass.map((data,index)=>(
             <option key={index} value={data.class}>{data.class}</option>
             ))}
            </select> 
             : " "
-          }    */}
+          }   
 
         <input type='number' value={rollNo} onChange={(e)=>setRollNo(e.target.value)} className='w-[70%] py-1 pl-2  rounded-md border-2' placeholder='Roll No*'></input>
         <input type='text' value={address} onChange={(e)=>setAddress(e.target.value)} className='w-[70%] py-1 pl-2  rounded-md border-2' placeholder='Address*'></input>

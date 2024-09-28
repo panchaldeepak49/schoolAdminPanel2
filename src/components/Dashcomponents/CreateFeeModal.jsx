@@ -9,8 +9,8 @@ const CreateFeeModal = ({transmitData,setShowCreateFeeModal,fetchAllAdmission}) 
     const[stuId,setstuId] = useState(transmitData._id);
   const[name,setName] = useState(transmitData.name);
   const[gclass,setGclass] = useState(transmitData.class);
-  
-//   const[image,setImage] = useState(displayingData.imageUrl);
+ 
+//const[image,setImage] = useState(displayingData.imageUrl);
   const [schId,setSchId] = useState('');
   var [april, setApril] = useState('');
   var[may,setMay] = useState('');
@@ -24,6 +24,8 @@ const CreateFeeModal = ({transmitData,setShowCreateFeeModal,fetchAllAdmission}) 
   var[january,setJanuary] = useState('');
   var[feb,setFeb] = useState('');
   var[march,setMarch] = useState('');
+  var[examFee,setExamFee] = useState('');
+  var[additional,setAdditional] = useState('');
   var[totalAmountRcvd, setTotalAmountRcvd] = useState('');
 
   useEffect(() => {
@@ -70,6 +72,8 @@ const CreateFeeModal = ({transmitData,setShowCreateFeeModal,fetchAllAdmission}) 
     "january" : january,
     "feb" : feb,
     "march" : march,
+    "examFee" : examFee,
+    "additional" : additional,
     "totalAmountDue" : totalAmountDue,
     "totalAmountAccepted" : totalAmountRcvd,
     "amountPending" : amountPending,
@@ -105,6 +109,8 @@ const CreateFeeModal = ({transmitData,setShowCreateFeeModal,fetchAllAdmission}) 
         
         <p><span className='font-semibold'>Standard:</span> {gclass}</p>
         <p className='flex gap-2'><span className='font-semibold '>Base Fee:</span></p>
+        <input type='text' value={examFee} onChange={(e)=>setExamFee(e.target.value)} className='w-[70%] py-0 pl-2  rounded-md  border-2' placeholder='Exam Fee'></input>
+        <input type='text' value={additional} onChange={(e)=>setAdditional(e.target.value)} className='w-[70%] py-0 pl-2  rounded-md  border-2' placeholder='Additional'></input>
         <p><span className='font-semibold'>Total Amount Due:</span> {totalAmountDue}</p>
         <p><span className='font-semibold'>Amount Accepted:</span> {totalAmountRcvd}</p>
         <p><span className='font-semibold'>Total Pending:</span> {amountPending}</p>

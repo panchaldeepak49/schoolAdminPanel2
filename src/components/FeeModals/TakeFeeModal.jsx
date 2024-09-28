@@ -6,8 +6,8 @@ import { message } from 'antd';
 
 
 const TakeFeeModal = ({transmitData,setTakeFeeModal,fetchStudentsFee}) => {
-    console.log(transmitData)
-    const[stuId,setstuId] = useState(transmitData.stuId);
+    //console.log(transmitData)
+  const[stuId,setstuId] = useState(transmitData.stuId);
   const[name,setName] = useState(transmitData.name);
   const[fee,setFee] = useState('600');
 
@@ -23,7 +23,10 @@ const TakeFeeModal = ({transmitData,setTakeFeeModal,fetchStudentsFee}) => {
   var[january,setJanuary] = useState(transmitData.january);
   var[feb,setFeb] = useState(transmitData.feb);
   var[march,setMarch] = useState(transmitData.march);
+  var[examFee,setExamFee] = useState(transmitData.examFee);
+  var[additional,setAdditional] = useState(transmitData.additional);
   var[totalAmountRcvd, setTotalAmountRcvd] = useState(transmitData.totalAmountAccepted);
+  
 
   const currentDate = new Date();
   const monthNames = [
@@ -33,8 +36,9 @@ const TakeFeeModal = ({transmitData,setTakeFeeModal,fetchStudentsFee}) => {
   const currentMonthName = monthNames[currentMonthIndex];
   //console.log(currentMonthIndex); 
 
+
   
-  const totalAmountDue = fee * (currentMonthIndex-2 );
+   const totalAmountDue = fee * (currentMonthIndex-2 ) + +examFee + +additional;
 
   useEffect(() => {
     //setFee(reqApiClass.fee)
@@ -64,6 +68,8 @@ const TakeFeeModal = ({transmitData,setTakeFeeModal,fetchStudentsFee}) => {
     "january" : january,
     "feb" : feb,
     "march" : march,
+    "examFee" : examFee,
+    "additional" : additional,
     "totalAmountDue" : totalAmountDue,
     "totalAmountAccepted" : totalAmountRcvd,
     "amountPending" : amountPending,
@@ -99,6 +105,14 @@ const TakeFeeModal = ({transmitData,setTakeFeeModal,fetchStudentsFee}) => {
         <input type='text' value={name}  className='w-[70%] py-1 pl-2  rounded-md  border-2' placeholder='Enter Name*'></input>
         
         <p><span className='font-semibold'>Base Fee:</span> {fee}</p>
+        <div className='flex justify-between items-center gap-4 w-[70%]'>
+        <p className='font-semibold'>Exam Fee :</p>
+        <input type='text' value={examFee} onChange={(e)=>setExamFee(e.target.value)} className='w-[70%] py-0 pl-2  rounded-md  border-2' placeholder='Exam Fee'></input>
+        </div>
+        <div className='flex justify-between items-center gap-4 w-[70%]'>
+        <p className='font-semibold'>Additional Charges :</p>
+        <input type='text' value={additional} onChange={(e)=>setAdditional(e.target.value)} className='w-[60%] py-0 pl-2  rounded-md  border-2' placeholder='Additional'></input>
+        </div>
         <p><span className='font-semibold'>Total Amount Due:</span> {totalAmountDue}</p>
         <p><span className='font-semibold'>Amount Accepted:</span> {totalAmountRcvd}</p>
         <p><span className='font-semibold'>Total Pending:</span> {amountPending}</p>

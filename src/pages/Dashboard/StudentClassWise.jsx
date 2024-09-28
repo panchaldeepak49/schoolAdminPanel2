@@ -11,6 +11,7 @@ const StudentClassWise = () => {
     const [schId,setSchId] = useState('');
     const [student,setStudent] = useState('');
     const [selectedStandard,setSelectedStandard] = useState('X');
+    const [apiClass,setApiClass] = useState('');
     // console.log(schId)
     // console.log(student)
 
@@ -66,7 +67,36 @@ const StudentClassWise = () => {
    }
   };
   const debouncedFetchData = debounce(fetchAllAdmission, 2000);
+/////////////////////////////////////////////////////////////////////////
+const fetchAllClass = async(searchQuery) => {
+  if (!schId) {
+      // Prevent API call if schId is not set
+      return;
+    }
+     
+  await axios.get(`http://localhost:4000/schoolApi/getAllClasses?schoolId=${schId}&&search=${searchQuery ?? " "}`,{
+      headers : {
+          "Content-Type" : "application/json"
+      }
+  })
+  .then((res)=>{
+     const result = res.data?.allClasses;
+     setApiClass(result);
+     //  console.log(result)
+     const apiMessage = res.data.message;
+     //message.success(apiMessage);
+  })
+  .catch((err)=>{
+      const apiMessage = err.response?.data?.message || 'an error occurred';
+      message.error(apiMessage)
+  })
+}
 
+useEffect(()=>{
+  if(schId){
+    fetchAllClass();
+  }
+},[schId])
 
   return (
     <>
@@ -77,9 +107,9 @@ const StudentClassWise = () => {
         <div className='flex justify-between items-center mt-4 py-2 bg-[#1877f2]'>
         <p className='invisible'>All Students</p>  
         
-        {/* <p className='text-xl font-Rubik text-white'>All Registered Students</p> */}
+        
         <p className='sm:text-xl text-white'>Class {selectedStandard} Students </p>
-        <select className='outline-none rounded-xl px-1 text-xs sm:text-base bg-blue-200 w-10 sm:w-16 cursor-pointer' value={selectedStandard} onChange={(e)=>setSelectedStandard(e.target.value)}>
+        {/* <select className='outline-none rounded-xl px-1 text-xs sm:text-base bg-blue-200 w-10 sm:w-16 cursor-pointer' value={selectedStandard} onChange={(e)=>setSelectedStandard(e.target.value)}>
          <option value='VI-A'>VI-A</option>
          <option value='VI-B'>VI-B</option>
           <option value='VII'>VII</option>
@@ -87,7 +117,17 @@ const StudentClassWise = () => {
           <option value='VIII-B'>VIII-B</option>
           <option value='IX'>IX</option>
           <option value='X'>X</option>
-        </select>
+        </select> */}
+        { apiClass.length > 0 ?
+           <select className='w-10 sm:w-16 rounded-md bg-orange-300 outline-none text-xs sm:text-base cursor-pointer' value={selectedStandard} onChange={(e)=>setSelectedStandard(e.target.value)}>
+            <option value='' disabled>Choose Class</option>
+            {apiClass.map((data,index)=>(
+            <option key={index} value={data.class}>{data.class}</option>
+            ))}
+           </select> 
+            : " "
+          } 
+
         <div className='pr-4 flex items-center gap-2'>
         <p className=' font-Rubik text-gray-100'>Total Students : {student.length} </p>
         <IoMailOutline className='text-xl'/>
