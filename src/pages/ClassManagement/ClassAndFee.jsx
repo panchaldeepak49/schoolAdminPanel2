@@ -13,8 +13,8 @@ const ClassAndFee = () => {
     
     const [schId,setSchId] = useState('');
     const [apiClass,setApiClass] = useState('');
-    // const {apiClass,setApiClass} = useContext(MyContext);
-    const [passData,setPassData] = useState('');
+   
+    
     const [loading,setLoading] = useState(false);
 
     const[isAddClass,setIsAddClass] = useState(false);
@@ -87,6 +87,14 @@ const ClassAndFee = () => {
         setTransmitData(value);
         setIsDeleteClass(true);
     }
+    /////////////////////////////////////////////////////////////////////applying pagination in frontend only
+  const [currentPage,setCurrentPage] = useState(1);
+
+  const recordsPerPage = 8;
+  const lastIndex = currentPage * recordsPerPage ;
+  const firstIndex = lastIndex - recordsPerPage;
+  const apiClass1 = apiClass.slice(firstIndex,lastIndex);
+  const nPage = apiClass ? Math.ceil(apiClass.length/recordsPerPage) : 0 ;
 
   return (
     <>
@@ -117,8 +125,8 @@ const ClassAndFee = () => {
         <th className='px-2 py-2 border border-gray-400 sm:min-w-44 text-sm'>Actions</th> 
       </tr>
      
-      { apiClass.length > 0 ? (
-      apiClass.map((value,index) =>(
+      { apiClass1.length > 0 ? (
+      apiClass1.map((value,index) =>(
         
       <tr className=' mt-10' key={index}>
         <td className='py-2 border border-gray-400 text-sm text-center'>{index+1}</td>
@@ -139,6 +147,17 @@ const ClassAndFee = () => {
       </table>
       </div>
     </div>
+
+    {nPage > 1 ? ( 
+        <div className='fixed bottom-2 md:bottom-8 w-full flex justify-evenly mt-4'>
+      
+      <button className={`bg-blue-400 px-4 py-2  rounded-xl text-white`} onClick={prePage}>Previous</button>
+          
+      <button className={`bg-blue-400 px-6 py-2 rounded-xl text-white`} onClick={nextPage} >Next</button>
+      <div className='bg-red-200 px-6 py-2 rounded-lg '>Page {currentPage} of {nPage}</div>
+      </div>
+     ) : null
+      } 
     </div>
 
     { isAddClass && <AddClass setIsAddClass={setIsAddClass} fetchAllClass={fetchAllClass} /> }
@@ -146,6 +165,17 @@ const ClassAndFee = () => {
     { isDeleteClass && <DeleteClass setIsDeleteClass={setIsDeleteClass} fetchAllClass={fetchAllClass} transmitData={transmitData} />}
     </>
   )
+  function prePage(){
+    if(currentPage !== 1){
+      setCurrentPage(currentPage - 1);
+    }
+  }
+
+  function nextPage(){
+    if(currentPage !== nPage){
+      setCurrentPage(currentPage + 1);
+    }
+  }
 }
 
 export default ClassAndFee

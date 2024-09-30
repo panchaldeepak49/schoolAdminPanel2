@@ -1,10 +1,12 @@
 import React,{ useState,useEffect } from 'react';
 import { IoMailOutline } from "react-icons/io5";
+import { MdOutlineAddHomeWork } from "react-icons/md";
 import axios from 'axios';
 import { message } from 'antd';
 import Search from '../../components/Search';
 import debounce from 'lodash.debounce';
 import Table2 from './Table2';
+import HomeWork from '../../components/Dashcomponents/HomeWork';
 
 const StudentClassWise = () => {
 
@@ -14,6 +16,7 @@ const StudentClassWise = () => {
     const [apiClass,setApiClass] = useState('');
     // console.log(schId)
     // console.log(student)
+    const[isHomeWork,setIsHomeWork] = useState(false);
 
     useEffect(() => {
         const storedSchId = localStorage.getItem('sch_id');
@@ -28,7 +31,7 @@ const StudentClassWise = () => {
             // Prevent API call if schId is not set
             return;
           }
-        await axios.get(`http://localhost:4000/schoolApi/allAdmission?schoolId=${schId}&&search=${searchQuery ?? ''}&&class=${selectedStandard}`,{
+        await axios.get(`http://localhost:4000/schoolApi/allAdmissionWCNS?schoolId=${schId}&&search=${searchQuery ?? ''}&&class=${selectedStandard}`,{
             headers : {
                 "Content-Type" : "application/json"
             }
@@ -97,6 +100,14 @@ useEffect(()=>{
     fetchAllClass();
   }
 },[schId])
+/////////////////////////////////////////////////////////////////////applying pagination in frontend only
+  const [currentPage,setCurrentPage] = useState(1);
+
+   const recordsPerPage = 8;
+   const lastIndex = currentPage * recordsPerPage ;
+   const firstIndex = lastIndex - recordsPerPage;
+   const student1 = student.slice(firstIndex,lastIndex);
+   const nPage = student ? Math.ceil(student.length/recordsPerPage) : 0 ;
 
   return (
     <>
@@ -108,7 +119,7 @@ useEffect(()=>{
         <p className='invisible'>All Students</p>  
         
         
-        <p className='sm:text-xl text-white'>Class {selectedStandard} Students </p>
+        <p className='sm:text-xl text-white'>Class {selectedStandard} Students  </p>
         {/* <select className='outline-none rounded-xl px-1 text-xs sm:text-base bg-blue-200 w-10 sm:w-16 cursor-pointer' value={selectedStandard} onChange={(e)=>setSelectedStandard(e.target.value)}>
          <option value='VI-A'>VI-A</option>
          <option value='VI-B'>VI-B</option>
@@ -128,17 +139,41 @@ useEffect(()=>{
             : " "
           } 
 
-        <div className='pr-4 flex items-center gap-2'>
+        <div className='pr-4 flex items-center gap-4'>
         <p className=' font-Rubik text-gray-100'>Total Students : {student.length} </p>
-        <IoMailOutline className='text-xl'/>
+        <MdOutlineAddHomeWork className='text-white text-2xl cursor-pointer' onClick={()=>setIsHomeWork(!isHomeWork)} />
         </div>
         </div>  
 
-         <Table2 student={student} fetchAllAdmission={fetchAllAdmission} />  
+         <Table2 student={student1} fetchAllAdmission={fetchAllAdmission} />  
+
+         {nPage > 1 ? ( 
+        <div className='fixed bottom-2 md:bottom-8 w-full flex justify-evenly mt-4'>
+      
+      <button className={`bg-blue-400 px-4 py-2  rounded-xl text-white`} onClick={prePage}>Previous</button>
+          
+      <button className={`bg-blue-400 px-6 py-2 rounded-xl text-white`} onClick={nextPage} >Next</button>
+      <div className='bg-red-200 px-6 py-2 rounded-lg '>Page {currentPage} of {nPage}</div>
+      </div>
+     ) : null
+      } 
 
         </div>
+
+        { isHomeWork && <HomeWork setIsHomeWork={setIsHomeWork} selectedStandard={selectedStandard} /> }
     </>
   )
+  function prePage(){
+    if(currentPage !== 1){
+      setCurrentPage(currentPage - 1);
+    }
+  }
+
+  function nextPage(){
+    if(currentPage !== nPage){
+      setCurrentPage(currentPage + 1);
+    }
+  }
 }
 
 export default StudentClassWise

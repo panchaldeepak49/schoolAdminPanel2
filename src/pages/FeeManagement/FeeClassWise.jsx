@@ -8,6 +8,8 @@ import debounce from 'lodash.debounce';
 import TakeFeeModal from '../../components/FeeModals/TakeFeeModal';
 import FeeDetailModal from '../../components/FeeModals/FeeDetailModal';
 import DeleteFeeModal from '../../components/FeeModals/DeleteFeeModal';
+import FeeCollectClassWise from './FeeCollectClassWise';
+import FeeColllectionWhole from './FeeColllectionWhole';
 
 
 const FeeClassWise = () => {
@@ -22,7 +24,7 @@ const FeeClassWise = () => {
       const[viewFeeModal,setViewFeeModal] = useState(false);
       const[deleteFeeModal,setDeleteFeeModal] = useState(false);
       const[transmitData,setTransmitData] = useState('');
-
+      const[isFeeCollect,setIsFeeCollect] = useState(false);
 
 
     useEffect(() => {
@@ -123,6 +125,15 @@ const FeeClassWise = () => {
         fetchAllClass();
       }
     },[schId])
+    /////////////////////////////////////////////////////////////////////applying pagination in frontend only
+  const [currentPage,setCurrentPage] = useState(1);
+
+  const recordsPerPage = 8;
+  const lastIndex = currentPage * recordsPerPage ;
+  const firstIndex = lastIndex - recordsPerPage;
+  const studentFee1 = studentFee.slice(firstIndex,lastIndex);
+  const nPage = studentFee ? Math.ceil(studentFee.length/recordsPerPage) : 0 ;
+
 
   return (
     <>
@@ -133,7 +144,7 @@ const FeeClassWise = () => {
         <div className='flex justify-between md:gap-10  mt-4 py-2 bg-[#1877f2]'>
           <p className='invisible'>Dummy</p>
         <p className='flex items-center gap-2 text:sm md:text-xl font-Rubik text-white'>Class {selectedStandard} 
-          <span className='hidden md:block'>Students </span>
+          <span className='hidden md:block'>Students  </span>
           <span className='ml-1 md:ml-0'>Fee Info (2024-25)</span> </p>
         {/* <select className='outline-none rounded-xl px-1 bg-blue-200 w-12 sm:w-14' value={selectedStandard} onChange={(e)=>setSelectedStandard(e.target.value)}>
          <option value='VI-A'>VI-A</option>
@@ -157,8 +168,8 @@ const FeeClassWise = () => {
         <p className='flex  text-xs sm:text-base font-Rubik text-gray-100'><span className='md:hidden'>T Stu : </span>
         <span className='hidden md:block'>Total Students :</span>
          {studentFee.length}</p>
-        <p className='text-xs sm:text-base font-Rubik cursor-pointer text-gray-100' onClick={''}>Collection </p>
-        <BsCollection className='text-white'/>
+        <p className='text-xs sm:text-base font-Rubik text-gray-100' onClick={''}>Collection </p>
+        <BsCollection className='text-white cursor-pointer' onClick={()=>setIsFeeCollect(!isFeeCollect)}/>
         </div>
         </div> 
 
@@ -177,8 +188,8 @@ const FeeClassWise = () => {
         <th className='px-2 py-2 border border-gray-400 sm:min-w-44 text-sm font-medium'>Actions</th> 
       </tr>
      
-      { studentFee.length > 0 ? (
-      studentFee.map((userData,index) =>(
+      { studentFee1.length > 0 ? (
+      studentFee1.map((userData,index) =>(
         
       <tr className=' mt-10' key={index} >
         <td className='py-2 border border-gray-400 text-sm text-center w-10'>{index+1}</td>
@@ -202,13 +213,38 @@ const FeeClassWise = () => {
       </div>
     </div>
     }
+
+    {nPage > 1 ? ( 
+        <div className='fixed bottom-2 md:bottom-8 w-full flex justify-evenly mt-4'>
+      
+      <button className={`bg-blue-400 px-4 py-2  rounded-xl text-white`} onClick={prePage}>Previous</button>
+          
+      <button className={`bg-blue-400 px-6 py-2 rounded-xl text-white`} onClick={nextPage} >Next</button>
+      <div className='bg-red-200 px-6 py-2 rounded-lg '>Page {currentPage} of {nPage}</div>
+      </div>
+     ) : null
+      } 
      </div> 
 
      { takeFeeModal && <TakeFeeModal transmitData={transmitData} setTakeFeeModal={setTakeFeeModal} fetchStudentsFee={fetchStudentsFee} /> }
      { viewFeeModal && <FeeDetailModal transmitData={transmitData} setViewFeeModal={setViewFeeModal} fetchStudentsFee={fetchStudentsFee} /> }
-      { deleteFeeModal && <DeleteFeeModal transmitData={transmitData} setDeleteFeeModal={setDeleteFeeModal} fetchStudentsFee={fetchStudentsFee} /> }
+     { deleteFeeModal && <DeleteFeeModal transmitData={transmitData} setDeleteFeeModal={setDeleteFeeModal} fetchStudentsFee={fetchStudentsFee} /> }
+     {/* { isFeeCollect && <FeeCollectClassWise setIsFeeCollect={setIsFeeCollect} selectedStandard={selectedStandard} /> } */}
+     { isFeeCollect && <FeeColllectionWhole setIsFeeCollect={setIsFeeCollect}  /> }
     </>
+    
   )
+  function prePage(){
+    if(currentPage !== 1){
+      setCurrentPage(currentPage - 1);
+    }
+  }
+
+  function nextPage(){
+    if(currentPage !== nPage){
+      setCurrentPage(currentPage + 1);
+    }
+  }
 }
 
 export default FeeClassWise

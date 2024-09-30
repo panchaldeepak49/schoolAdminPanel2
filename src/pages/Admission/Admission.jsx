@@ -10,14 +10,14 @@ const Admission = () => {
     const[schId,setSchId] = useState('');
     const[name,setName] = useState('');
     const[fatherName,setFatherName] = useState('');
-    const [selectClass, setSelectClass] = useState(null);
+    const [selectClass, setSelectClass] = useState('');
     const [apiClass,setApiClass] = useState('');
     const[rollNo,setRollNo] = useState('');
     const[address,setAddress] = useState('');
     const[admissionDate,setAdmissionDate] = useState('');
     const[gender,setGender] = useState('');
     const[contact,setContact] = useState('');
-    console.log(selectClass);
+    //console.log(selectClass);
     const[imgURL,setImgURL] = useState('');
 
     useEffect(() => {

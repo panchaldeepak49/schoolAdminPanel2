@@ -15,12 +15,14 @@ const AddStaff = ({setIsAddStaff,fetchAllStaff}) => {
     const [contact,setContact] = useState("");
     const [address,setAddress] = useState("");
     const [designation,setDesignation] = useState("");
-    const [classAssigned,setClassAssigned] = useState("");
+    // const [classAssigned,setClassAssigned] = useState("");
+    const [selectClass,setSelectClass] = useState("");
     const [salary,setSalary] = useState("");
     const [bankName,setBankName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [imgURL,setImgURL] = useState("");
     //console.log(imgURL)
+    const [apiClass,setApiClass] = useState("");
 
     useEffect(() => {
         const storedSchId = localStorage.getItem('sch_id');
@@ -38,7 +40,7 @@ const AddStaff = ({setIsAddStaff,fetchAllStaff}) => {
         "contact" : contact,
         "address" : address,
         "designation" : designation,
-        "classAssigned" : classAssigned,
+        "classAssigned" : selectClass,
         "salary" : salary,
         "bankName" : bankName,
         "imageUrl" : imgURL,
@@ -64,7 +66,37 @@ const AddStaff = ({setIsAddStaff,fetchAllStaff}) => {
             message.error(apiMessage)
         })
       }
+    //////////////////////////////////////////////////////////////////////////////////////////
+    const fetchAllClass = async(searchQuery) => {
+        if (!schId) {
+            // Prevent API call if schId is not set
+            return;
+          }
+           
+        await axios.get(`http://localhost:4000/schoolApi/getAllClasses?schoolId=${schId}&&search=${searchQuery ?? " "}`,{
+            headers : {
+                "Content-Type" : "application/json"
+            }
+        })
+        .then((res)=>{
+           const result = res.data?.allClasses;
+           setApiClass(result);
+            // console.log(result)
+           const apiMessage = res.data.message;
+           message.success(apiMessage);
+          
+        })
+        .catch((err)=>{
+            const apiMessage = err.response?.data?.message || 'an error occurred';
+            message.error(apiMessage)
+        })
+    }
 
+    useEffect(()=>{
+        if(schId){
+          fetchAllClass();
+        }
+    },[schId])
 
   return (
     <>
@@ -83,7 +115,7 @@ const AddStaff = ({setIsAddStaff,fetchAllStaff}) => {
         <InputField type='text' placeholder='Address' value={address}  onChange={(e)=>setAddress(e.target.value)}/>
         <InputField type='text' placeholder='Designation' value={designation}  onChange={(e)=>setDesignation(e.target.value)}/>
         {/* <InputField type='text' placeholder='Class Allot' value={classAssigned}  onChange={(e)=>setClassAssigned(e.target.value)}/> */}
-        <select className='outline-none border border-gray-300 rounded-md px-1 w-[100%] cursor-pointer' value={classAssigned} onChange={(e)=>setClassAssigned(e.target.value)}>
+        {/* <select className='outline-none border border-gray-300 rounded-md px-1 w-[100%] cursor-pointer' value={classAssigned} onChange={(e)=>setClassAssigned(e.target.value)}>
          <option value=''>No Class</option>
          <option value='V'>V</option>
          <option value='VI-A'>VI-A</option>
@@ -93,7 +125,17 @@ const AddStaff = ({setIsAddStaff,fetchAllStaff}) => {
           <option value='VIII-B'>VIII-B</option>
           <option value='IX'>IX</option>
           <option value='X'>X</option>
-        </select>
+        </select> */}
+
+        { apiClass.length > 0 ?
+           <select className='w-[100%] h-8 border border-gray-300 outline-none pl-2 rounded-md' value={selectClass} onChange={(e)=>setSelectClass(e.target.value)}>
+            <option value='' disabled>Choose Class</option>
+            {apiClass.map((data,index)=>(
+            <option key={index} value={data.class}>{data.class}</option>
+            ))}
+           </select> 
+            : " "
+          } 
         <InputField type='text' placeholder='Salary' value={salary}  onChange={(e)=>setSalary(e.target.value)}/>
         <InputField type='text' placeholder='Bank Name' value={bankName}  onChange={(e)=>setBankName(e.target.value)}/>
         </div>

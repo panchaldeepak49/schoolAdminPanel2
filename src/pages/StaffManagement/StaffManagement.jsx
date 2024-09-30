@@ -9,6 +9,7 @@ import debounce from "lodash.debounce";
 import Search from "../../components/Search";
 import EditStaff from "./EditStaff";
 import RemoveStaff from "./RemoveStaff";
+import SendMailBox from "./SendMailBox";
 
 
 const StaffManagement = () => {
@@ -93,6 +94,14 @@ const StaffManagement = () => {
     setIsRemoveStaff(true);
     setTransmitData(value);
  }
+ /////////////////////////////////////////////////////////////////////applying pagination in frontend only
+ const [currentPage,setCurrentPage] = useState(1);
+
+ const recordsPerPage = 8;
+ const lastIndex = currentPage * recordsPerPage ;
+ const firstIndex = lastIndex - recordsPerPage;
+ const user1 = user.slice(firstIndex,lastIndex);
+ const nPage = user ? Math.ceil(user.length/recordsPerPage) : 0 ;
 
 
   return (
@@ -109,7 +118,7 @@ const StaffManagement = () => {
         <p className='flex gap-2 font-rubik cursor-pointer' onClick={()=>setIsAddStaff(!isAddStaff)}>
         <img src={userImg} className='w-4 sm:w-6 rounded-full' alt='missing'></img>
           +</p>
-        <p className='font-semibold cursor-pointer flex items-center sm:text-2xl' onClick={handleMailBox}><IoMailOutline /></p>  
+        <p className='font-semibold cursor-pointer flex items-center sm:text-2xl' onClick={()=>setIsSendMailBox(!isSendMailBox)}><IoMailOutline /></p>  
         </div>
     </div> 
 
@@ -132,8 +141,8 @@ const StaffManagement = () => {
         <th className='px-2 py-2 border border-gray-400 sm:min-w-44 text-sm'>Actions</th> 
       </tr>
      
-      { user.length > 0 ? (
-      user.map((value,index) =>(
+      { user1.length > 0 ? (
+      user1.map((value,index) =>(
         
       <tr className=' mt-10' key={index}>
         <td className='py-2 border border-gray-400 text-sm text-center'>{index+1}</td>
@@ -165,13 +174,36 @@ const StaffManagement = () => {
     </div>
      }
 
+    {nPage > 1 ? ( 
+        <div className='fixed bottom-2 md:bottom-8 w-full flex justify-evenly mt-4'>
+      
+      <button className={`bg-[#1877f2] hover:bg-violet-600 px-4 py-2  rounded-xl text-white`} onClick={prePage}>Previous</button>
+          
+      <button className={`bg-[#1877f2] hover:bg-violet-600 px-6 py-2 rounded-xl text-white`} onClick={nextPage} >Next</button>
+      <div className='bg-red-200 px-6 py-2 rounded-lg '>Page {currentPage} of {nPage}</div>
+      </div>
+     ) : null
+      } 
+
     </div>
 
     { isAddStaff && <AddStaff setIsAddStaff={setIsAddStaff} fetchAllStaff={fetchAllStaff} /> }
     { isEditStaff && <EditStaff setIsEditStaff={setIsEditStaff} transmitData={transmitData} fetchAllStaff={fetchAllStaff} /> }
     { isRemoveStaff && <RemoveStaff setIsRemoveStaff={setIsRemoveStaff} transmitData={transmitData} fetchAllStaff={fetchAllStaff} />}
+    { isSendMailBox && <SendMailBox setIsSendMailBox={setIsSendMailBox} /> }
     </>
   )
+  function prePage(){
+    if(currentPage !== 1){
+      setCurrentPage(currentPage - 1);
+    }
+  }
+
+  function nextPage(){
+    if(currentPage !== nPage){
+      setCurrentPage(currentPage + 1);
+    }
+  }
 }
 
 export default StaffManagement
